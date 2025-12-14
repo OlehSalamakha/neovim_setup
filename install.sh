@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Standalone Neovim Installation Script for Fedora
+# Standalone Neovim Installation Script for Debian/Ubuntu
 # Based on Omakub configuration
 
 set -e
@@ -9,23 +9,24 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "========================================="
-echo "  Neovim Installation for Fedora"
+echo "  Neovim Installation for Debian/Ubuntu"
 echo "========================================="
 echo ""
 
-# Check if running on Fedora
-if [ ! -f /etc/fedora-release ]; then
-    echo "ERROR: This script is designed for Fedora-based systems."
-    echo "Current system is not Fedora."
+# Check if running on Debian/Ubuntu
+if [ ! -f /etc/debian_version ]; then
+    echo "ERROR: This script is designed for Debian/Ubuntu-based systems."
+    echo "Current system is not Debian/Ubuntu."
     exit 1
 fi
 
-echo "✓ Fedora system detected"
+echo "✓ Debian/Ubuntu system detected"
 echo ""
 
 # Install system dependencies
 echo "Installing system dependencies..."
-sudo dnf install -y neovim luarocks tree-sitter-cli git curl unzip >/dev/null 2>&1
+sudo apt-get update >/dev/null 2>&1
+sudo apt-get install -y neovim luarocks git curl unzip >/dev/null 2>&1
 echo "✓ System dependencies installed"
 echo ""
 

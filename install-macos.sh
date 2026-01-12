@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Standalone Neovim Installation Script
+# Standalone Neovim Installation Script for macOS
 # Based on Omakub configuration
-# Supports: macOS, Fedora, Ubuntu/Debian
 
 set -e
 
@@ -10,44 +9,48 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 echo "========================================="
-echo "  Neovim Installation"
+echo "  Neovim Installation for macOS"
 echo "========================================="
 echo ""
 
-# Detect OS and route to appropriate installer
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    echo "Detected macOS system"
-    exec "$SCRIPT_DIR/install-macos.sh"
-elif [ -f /etc/fedora-release ]; then
-    echo "✓ Fedora system detected"
-    echo ""
-elif [ -f /etc/debian_version ]; then
-    echo "ERROR: Debian/Ubuntu support not yet implemented."
-    echo "Please contribute apt support at: https://github.com/yourusername/neovim-installer"
-    exit 1
-else
-    echo "ERROR: Unsupported operating system."
-    echo "Supported systems: macOS, Fedora"
-    echo "Current OS: $OSTYPE"
+# Check if running on macOS
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "ERROR: This script is designed for macOS."
+    echo "Current system is not macOS."
     exit 1
 fi
 
+echo "✓ macOS system detected"
+echo ""
+
+# Check if Homebrew is installed
+if ! command -v brew &> /dev/null; then
+    echo "ERROR: Homebrew is not installed."
+    echo "Please install Homebrew first: https://brew.sh"
+    echo ""
+    echo "Run this command:"
+    echo '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+    exit 1
+fi
+
+echo "✓ Homebrew detected"
+echo ""
+
 # Install system dependencies
 echo "Installing system dependencies..."
-sudo dnf install -y neovim luarocks tree-sitter-cli git curl unzip >/dev/null 2>&1
+brew install neovim luarocks tree-sitter git curl unzip >/dev/null 2>&1
 echo "✓ System dependencies installed"
 echo ""
 
 # Install Cascadia Mono Nerd Font
-if ! fc-list | grep -i "CaskaydiaMono Nerd Font" >/dev/null; then
+if ! fc-list | grep -i "CaskaydiaMono Nerd Font" >/dev/null 2>&1; then
     echo "Installing Cascadia Mono Nerd Font..."
     cd /tmp
     curl -sL -o CascadiaMono.zip "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/CascadiaMono.zip"
     unzip -q CascadiaMono.zip -d CascadiaMono
-    mkdir -p ~/.local/share/fonts
-    cp CascadiaMono/*.ttf ~/.local/share/fonts/
+    mkdir -p ~/Library/Fonts
+    cp CascadiaMono/*.ttf ~/Library/Fonts/
     rm -rf CascadiaMono.zip CascadiaMono
-    fc-cache -fv >/dev/null 2>&1
     cd - >/dev/null
     echo "✓ Cascadia Mono Nerd Font installed"
 else
@@ -112,7 +115,7 @@ echo "  • Space sg       - Search text (grep)"
 echo "  • Space ,        - Switch buffers"
 echo "  • Space e        - Toggle file explorer"
 echo ""
-echo "Optional: Add to your shell config (~/.bashrc):"
+echo "Optional: Add to your shell config (~/.zshrc):"
 echo "  export EDITOR=nvim"
 echo ""
 echo "Configuration location: ~/.config/nvim/"

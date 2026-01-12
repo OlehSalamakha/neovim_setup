@@ -1,6 +1,6 @@
-# Neovim for Fedora
+# Neovim Installer
 
-Standalone Neovim installer for Fedora with Omakub-style configuration.
+Standalone Neovim installer for macOS and Fedora with Omakub-style configuration.
 
 ## Features
 
@@ -14,11 +14,19 @@ Standalone Neovim installer for Fedora with Omakub-style configuration.
 
 ## Requirements
 
+### macOS
+- macOS (any recent version)
+- [Homebrew](https://brew.sh) package manager
+- Internet connection
+
+### Fedora
 - Fedora-based Linux distribution
 - `sudo` access
 - Internet connection
 
 ## Installation
+
+The installer automatically detects your operating system (macOS or Fedora) and runs the appropriate installation.
 
 ```bash
 cd neovim-fedora
@@ -26,10 +34,15 @@ cd neovim-fedora
 ```
 
 The script will:
-1. Install Neovim and dependencies (luarocks, tree-sitter-cli)
-2. Download and install Cascadia Mono Nerd Font
-3. Clone LazyVim starter configuration
-4. Apply Omakub customizations (theme, transparency, settings)
+1. Detect your operating system
+2. Install Neovim and dependencies (luarocks, tree-sitter-cli)
+   - macOS: Uses Homebrew
+   - Fedora: Uses dnf
+3. Download and install Cascadia Mono Nerd Font
+   - macOS: Installs to `~/Library/Fonts/`
+   - Fedora: Installs to `~/.local/share/fonts/`
+4. Clone LazyVim starter configuration
+5. Apply Omakub customizations (theme, transparency, settings)
 
 ## What Gets Installed
 
@@ -47,7 +60,9 @@ The script will:
 - **Scrolling**: No animations
 
 ### Font
-- **CaskaydiaMono Nerd Font** installed to `~/.local/share/fonts/`
+- **CaskaydiaMono Nerd Font**
+  - macOS: `~/Library/Fonts/`
+  - Fedora: `~/.local/share/fonts/`
 
 ## First Run
 
@@ -92,7 +107,9 @@ Press `Space s k` to search all keymaps, or see [LazyVim keybindings documentati
 
 ### Set Neovim as Default Editor
 
-Add to your shell config (`~/.bashrc` or `~/.zshrc`):
+Add to your shell config:
+- macOS: `~/.zshrc`
+- Fedora: `~/.bashrc`
 
 ```bash
 export EDITOR=nvim
@@ -118,7 +135,7 @@ To add your own customizations, create files in these directories. See [LazyVim 
 
 ## Uninstall
 
-To completely remove Neovim configuration:
+### Remove Neovim Configuration (All Systems)
 
 ```bash
 rm -rf ~/.config/nvim
@@ -126,14 +143,26 @@ rm -rf ~/.local/share/nvim
 rm -rf ~/.local/state/nvim
 ```
 
-To remove system packages:
+### Remove System Packages
 
+**macOS:**
+```bash
+brew uninstall neovim luarocks tree-sitter
+```
+
+**Fedora:**
 ```bash
 sudo dnf remove neovim luarocks tree-sitter-cli
 ```
 
-To remove the font:
+### Remove Font
 
+**macOS:**
+```bash
+rm -rf ~/Library/Fonts/CaskaydiaMono*
+```
+
+**Fedora:**
 ```bash
 rm -rf ~/.local/share/fonts/CaskaydiaMono*
 fc-cache -fv
@@ -143,10 +172,10 @@ fc-cache -fv
 
 This folder is completely standalone. You can:
 
-1. Copy the entire `neovim-fedora/` folder to any Fedora machine
+1. Copy the entire folder to any macOS or Fedora machine
 2. Run `./install.sh`
 
-No dependencies on Omakub or any external project structure.
+The installer will automatically detect your OS and install accordingly. No dependencies on Omakub or any external project structure.
 
 ## Troubleshooting
 

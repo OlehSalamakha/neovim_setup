@@ -4,15 +4,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Standalone Neovim installer for Fedora that sets up LazyVim with Omakub-inspired customizations. The installer is completely self-contained and portable - designed to be copied to any Fedora machine and run independently.
+Standalone Neovim installer for macOS and Fedora that sets up LazyVim with Omakub-inspired customizations. The installer is completely self-contained and portable - designed to be copied to any compatible machine and run independently.
 
 ## Architecture
 
-### Installation Flow (install.sh)
+### Installation Flow
+
+#### Main Installer (install.sh)
+
+1. **OS Detection**: Detects operating system via `$OSTYPE` and system files
+   - macOS: Checks for `darwin*` in `$OSTYPE`, then executes `install-macos.sh`
+   - Fedora: Checks for `/etc/fedora-release`, continues with Fedora installation
+   - Debian/Ubuntu: Detected but not yet implemented (shows error message)
+2. **Routes to OS-specific installation** (macOS) or **continues with Fedora installation**
+
+#### macOS Installation Flow (install-macos.sh)
+
+1. **System validation**: Checks for macOS via `$OSTYPE == "darwin*"`
+2. **Homebrew check**: Verifies Homebrew is installed, exits with instructions if not
+3. **Package installation**: Installs neovim, luarocks, tree-sitter, and utilities via Homebrew
+4. **Font installation**: Downloads CascadiaMono Nerd Font from GitHub releases, installs to `~/Library/Fonts/`
+5. **Base configuration**: Clones LazyVim starter to `~/.config/nvim/` (removes `.git` for portability)
+6. **Customization overlay**: Copies config files from `configs/neovim/` to appropriate locations in `~/.config/nvim/`
+
+#### Fedora Installation Flow (install.sh continuation)
 
 1. **System validation**: Checks for Fedora-based system via `/etc/fedora-release`
 2. **Package installation**: Installs neovim, luarocks, tree-sitter-cli, and utilities via dnf
-3. **Font installation**: Downloads CascadiaMono Nerd Font from GitHub releases, installs to `~/.local/share/fonts/`
+3. **Font installation**: Downloads CascadiaMono Nerd Font from GitHub releases, installs to `~/.local/share/fonts/`, runs `fc-cache`
 4. **Base configuration**: Clones LazyVim starter to `~/.config/nvim/` (removes `.git` for portability)
 5. **Customization overlay**: Copies config files from `configs/neovim/` to appropriate locations in `~/.config/nvim/`
 
@@ -28,6 +47,25 @@ The `configs/neovim/` directory contains overlays applied on top of the LazyVim 
 
 The installer also appends `vim.opt.relativenumber = false` to `~/.config/nvim/lua/config/options.lua` to disable relative line numbers.
 
+## Platform-Specific Differences
+
+### macOS vs Fedora
+
+| Aspect | macOS | Fedora |
+|--------|-------|--------|
+| Package Manager | Homebrew (`brew`) | DNF (`dnf`) |
+| Font Location | `~/Library/Fonts/` | `~/.local/share/fonts/` |
+| Font Cache | Auto-updated by system | Requires `fc-cache -fv` |
+| Default Shell | zsh (`~/.zshrc`) | bash (`~/.bashrc`) |
+| Prerequisites | Homebrew must be installed | sudo access required |
+
+### macOS-Specific Notes
+
+- **Homebrew Requirement**: The installer checks for Homebrew and exits with installation instructions if not found
+- **Font Installation**: Fonts are installed to `~/Library/Fonts/` (user-specific) rather than system-wide
+- **No Font Cache**: macOS automatically detects new fonts; no `fc-cache` command needed
+- **Shell Config**: Instructions reference `~/.zshrc` instead of `~/.bashrc`
+
 ## Common Commands
 
 ### Installation
@@ -35,11 +73,16 @@ The installer also appends `vim.opt.relativenumber = false` to `~/.config/nvim/l
 # Run the installer
 ./install.sh
 
-# Complete uninstall
+# Complete uninstall - Fedora
 rm -rf ~/.config/nvim ~/.local/share/nvim ~/.local/state/nvim
 sudo dnf remove neovim luarocks tree-sitter-cli
 rm -rf ~/.local/share/fonts/CaskaydiaMono*
 fc-cache -fv
+
+# Complete uninstall - macOS
+rm -rf ~/.config/nvim ~/.local/share/nvim ~/.local/state/nvim
+brew uninstall neovim luarocks tree-sitter
+rm -rf ~/Library/Fonts/CaskaydiaMono*
 ```
 
 ### Testing Changes
